@@ -70,28 +70,6 @@ optimize = tf.train.AdamOptimizer().minimize(cost)
 init = tf.initialize_all_variables()
 
 
-def plot(samples):
-	figr = plt.figure(figsize = (4,4))
-	gs = gridspec.GridSpec(4, 4)
-	gs.update(wspace = 0.05 , hspace = 0.05)
-
-	for i, sample in enumerate(samples):
-		a = plt.subplot(gs[i])
-		plt.axis('off')
-		a.set_xticklabels([])
-		a.set_yticklabels([])
-		a.set_aspect('equal')
-		plt.imshow(sample.reshape(28,28), cmap = 'gray_r')
-
-	return figr
-
-
-'''if not os.path.exists('rohitDeAuto/'):
-	os.makedirs('rohitDeAuto/')
-
-i = 0
-'''
-
 with tf.Session() as session:
 
 	session.run(init)
