@@ -131,7 +131,7 @@ if not os.path.exists('properout/'):
 with tf.Session() as session:
 	session.run(init)
 
-	for i in range(150000):
+	for it in range(150000):
 		
 		if it % 10000 == 0:
 			samples = session.run(G, feed_dict = {Z : sample_Z(64,Z_dim)})
