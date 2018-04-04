@@ -101,11 +101,44 @@ def sample_Z(m, n):
 
 Z_dim = 150
 
+def plot(samples):
+	figr = plt.figure(figsize = (4,4))
+	gs = gridspec.GridSpec(4, 4)
+	gs.update(wspace = 0.05 , hspace = 0.05)
+	for i, sample in enumerate(samples):
+		if i <= 15 :
+			a = plt.subplot(gs[i])
+			plt.axis('off')
+			a.set_xticklabels([])
+			a.set_yticklabels([])
+			a.set_aspect('equal')
+			plt.imshow(sample.reshape(28,28), cmap = 'gray_r')
+
+		else :
+			break
+
+	return figr
+
+
+i = 0
+
+if not os.path.exists('properout/'):
+	os.makedirs('properout/')
+
+
+
 
 with tf.Session() as session:
 	session.run(init)
 
-	for i in range(100000):
+	for i in range(150000):
+		
+		if it % 10000 == 0:
+			samples = session.run(G, feed_dict = {Z : sample_Z(64,Z_dim)})
+			fig = plot(samples)
+			plt.savefig('properout/{}.png'.format(str(i).zfill(3)), bbox_inches = 'tight')
+			i+=1
+			plt.close(fig)
 
 		X_mb , _ = mnist.train.next_batch(batch)
 
