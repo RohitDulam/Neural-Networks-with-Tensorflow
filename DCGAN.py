@@ -2,7 +2,7 @@ import tensorflow as tf
 import numpy as np
 from tensorflow.examples.tutorials.mnist import input_data
 
-mnist = input_data.read_data_sets("MNIST_data/" , one_hot = True)
+mnist = input_data.read_data_sets("MNIST_data/")
 batch = 64
 X_shape = tf.placeholder(tf.float32 , [None , 784])
 X = tf.reshape(X_shape , [batch,28,28,1])
@@ -24,6 +24,11 @@ filter4 = tf.Variable(tf.random_normal(kernel4 , stddev = 0.005))
 theta_D = [filter1,filter2,filter3,filter4]
 
 
+
+def leakyrelu(tnsr, alpha = 0.15):
+	return tf.maximum(alpha*tnsr , tnsr)
+
+
 def batch_norm(tnsr):
 
 	 mean , variance = tf.nn.moments(tnsr , axes = [0,1,2])
@@ -32,22 +37,22 @@ def batch_norm(tnsr):
 	 beta = tf.Variable(tf.constant(1.0 , shape = [tnsr.get_shape().as_list()[-1]]))
 
 	 norm = tf.nn.batch_normalization(tnsr , mean , variance , alpha , beta , 1e-3)
-	 #print(norm)
+	
 
 	 return norm
 
 
 def discriminator(x):
 
-	l1 = tf.nn.relu(batch_norm(tf.nn.conv2d(x , filter1 , strides = stride , padding = 'SAME')))
+	l1 = leakyrelu(batch_norm(tf.nn.conv2d(x , filter1 , strides = stride , padding = 'SAME')))
 	
-	l2 = tf.nn.relu(batch_norm(tf.nn.conv2d(l1 , filter2 , strides = stride , padding = 'SAME')))
+	l2 = leakyrelu(batch_norm(tf.nn.conv2d(l1 , filter2 , strides = stride , padding = 'SAME')))
 	
-	l3 = tf.nn.relu(batch_norm(tf.nn.conv2d(l2 , filter3 , strides = stride , padding = 'SAME')))
+	l3 = leakyrelu(batch_norm(tf.nn.conv2d(l2 , filter3 , strides = stride , padding = 'SAME')))
 	
 	l4_shaping = tf.reshape(l3 , [-1 , 4 * 4 * 128])
 	
-	l4 = tf.nn.relu(tf.matmul(l4_shaping , filter4))
+	l4 = leakyrelu(tf.matmul(l4_shaping , filter4))
 	
 	return tf.nn.sigmoid(l4) , l4
 
@@ -69,15 +74,15 @@ def generator(z):
 	
 	l2_deconv = tf.nn.conv2d_transpose(l2_shaping , filter_1 ,output_shape = [batch , 7 , 7 , 16] ,strides = [1 , 2, 2, 1], padding = 'SAME')
 	
-	l2 = tf.nn.relu(batch_norm(l2_deconv))
+	l2 = leakyrelu(batch_norm(l2_deconv))
 	
 	l3_deconv = tf.nn.conv2d_transpose(l2, filter_2 , output_shape = [batch , 14 , 14 , 8] , strides = [1 , 2, 2, 1], padding = 'SAME')
 	
-	l3 = tf.nn.relu(batch_norm(l3_deconv))
+	l3 = leakyrelu(batch_norm(l3_deconv))
 	
 	l4 = tf.nn.conv2d_transpose(l3 , filter_3 , output_shape = [batch , 28 , 28 , 1] , strides = [1 , 2, 2, 1], padding = 'SAME')
 	
-	return tf.nn.tanh(l4)
+	return tf.nn.sigmoid(l4)
 
 G = generator(Z)
 D , D_Logits = discriminator(X)
@@ -122,8 +127,8 @@ def plot(samples):
 
 i = 0
 
-if not os.path.exists('properout/'):
-	os.makedirs('properout/')
+if not os.path.exists('output/'):
+	os.makedirs('output/')
 
 
 
@@ -136,7 +141,7 @@ with tf.Session() as session:
 		if it % 10000 == 0:
 			samples = session.run(G, feed_dict = {Z : sample_Z(64,Z_dim)})
 			fig = plot(samples)
-			plt.savefig('properout/{}.png'.format(str(i).zfill(3)), bbox_inches = 'tight')
+			plt.savefig('output/{}.png'.format(str(i).zfill(3)), bbox_inches = 'tight')
 			i+=1
 			plt.close(fig)
 
