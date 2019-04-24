@@ -7,14 +7,6 @@ from tqdm import tqdm
 import tensorflow as tf
 import matplotlib.pyplot as plt
 
-#train_data= 'C:/Users/Sneha/Desktop/abc/Output'
-#train_data = 'C:/Users/dulam/Desktop/Advanced_CV/Sneha Project/abc/Output'
-train_data = 'C:/Users/dulam/Desktop/Advanced_CV/Sneha_Project/abc/train'
-#train_data = 'C:/Users/dulam/Desktop/Advanced_CV/Sneha_Project/alltrain'
-#test_data = 'C:/Users/dulam/Desktop/Advanced_CV/Sneha Project/testing'
-test_data = 'C:/Users/dulam/Desktop/Advanced_CV/Sneha_Project/Final_test'
-#test_data=  'C:/Users/Sneha/Desktop/samples/testing'
-
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
 sess = tf.Session(config=config)
@@ -60,9 +52,6 @@ def one_hot_label(img):
     else:
         ohl=[0,0,0,0,0,0,0,0,0,1]
         return ohl
-    	#print("IMG", img)
-    	#print("LABEL", label)
-
 
 def train_data_with_label():
     train_images=[]
